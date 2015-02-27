@@ -61,7 +61,10 @@ command_apply(_,_) -> <<"unknown command">>.
 
 -spec check_filename(binary()) -> true | false.
 check_filename(FileName) ->
+   TempDirectory = muploader_utils:get_tmp_dir(),
+   L = size(TempDirectory) - 1,
+   <<T:L/binary, "/">> = TempDirectory,
    case filename:dirname(FileName) of
-        <<"/tmp">> -> true
-        ;_         -> false
+        T  -> true
+        ;_ -> false
    end.

@@ -19,7 +19,9 @@ handle(Req, State) ->
     %Pid = spawn(?MODULE, save_file, [Req2, SaveFileName]),
     %lager:debug("spawned: ~p", [Pid]),
 
-    {ok, Req4} = reply(jiffy:encode({[{<<"type">>, <<"upload">>}, {<<"status">>, <<"ok">>}, {<<"filename">>, SaveFileName}]}), Req2),   
+    PreviewFileName = preview_file(SaveFileName),
+
+    {ok, Req4} = reply(jiffy:encode({[{<<"type">>, <<"upload">>}, {<<"status">>, <<"ok">>}, {<<"filename">>, SaveFileName}, {<<"preview">>, PreviewFileName}]}), Req2),   
     lager:debug("PH HANDLE4: ~p", [Req4]),
 
 
@@ -37,7 +39,8 @@ save_file(Req, FileName) ->
 
 -spec get_file_name(binary(), binary()) -> binary().
 get_file_name(UploadFileName, _InputName) ->
-    TempDirectory = <<"/tmp/">>,
+    %TempDirectory = <<"/tmp/">>,
+    TempDirectory = muploader_utils:get_tmp_dir(),
     TN1 = <<TempDirectory/binary, UploadFileName/binary>>,
     case filelib:is_regular(TN1) of
         true  -> get_file_name(modify_ufn(UploadFileName), _InputName);
@@ -71,6 +74,16 @@ get_part_body(Req, IoDevice) ->
         M ->
             lager:debug("LALALALALA ~p", [M]), 
             M
+    end.
+
+-spec preview_file(binary()) -> binary().
+preview_file(FileName) ->
+    RootName = filename:rootname(FileName),
+    ExtName  = filename:extension(FileName), 
+    lager:debug("PF: ~p ~p", [RootName, ExtName]),
+    case muploader_utils:is_supported_image_format(ExtName) of
+        true -> muploader_utils:create_preview(<<RootName/binary, "_mu_pr", ExtName/binary>>, <<RootName/binary,ExtName/binary>>), <<RootName/binary,"_mu_pr", ExtName/binary>>
+        ;_   -> <<"muploader_error">>
     end.
 
 reply(Response, Req) ->
