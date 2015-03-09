@@ -82,7 +82,7 @@ preview_file(FileName) ->
     ExtName  = filename:extension(FileName), 
     lager:debug("PF: ~p ~p", [RootName, ExtName]),
     case muploader_utils:is_supported_image_format(ExtName) of
-        true -> muploader_utils:create_preview(<<RootName/binary, "_mu_pr", ExtName/binary>>, <<RootName/binary,ExtName/binary>>), <<RootName/binary,"_mu_pr", ExtName/binary>>
+        true -> muploader_utils:create_preview(<<RootName/binary, "_mu_pr.png">>, <<RootName/binary,ExtName/binary>>), <<RootName/binary,"_mu_pr.png">>
         ;_   -> <<"muploader_error">>
     end.
 
