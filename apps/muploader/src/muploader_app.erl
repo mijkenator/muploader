@@ -14,6 +14,7 @@ start(_StartType, _StartArgs) ->
         {'_', [
             {"/muploader/uploader/[...]", muploader_handler, []}
             ,{"/muploader/api/[...]", muploader_api_handler, []}
+            ,{"/collection/[...]", muploader_collection_handler, []}
             ,{"/[...]", cowboy_static, {dir, "../../priv_dir/html", [{mimetypes, cow_mimetypes, all}]}}
         ]}
     ]),

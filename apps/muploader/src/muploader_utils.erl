@@ -2,12 +2,16 @@
 
 -export([
     get_tmp_dir/0
+    ,get_tmp_dir/1
     ,is_supported_image_format/1
     ,create_preview/2
     ,get_preview_options/0
 ]).
 
 get_tmp_dir() -> <<"/tmp/">>.
+
+get_tmp_dir(<<"collection[logo]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_) -> <<"/tmp/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.
 is_supported_image_format(ExtName) ->
