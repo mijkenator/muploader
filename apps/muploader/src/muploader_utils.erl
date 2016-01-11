@@ -10,7 +10,8 @@
 
 get_tmp_dir() -> <<"/tmp/">>.
 
-get_tmp_dir(<<"collection[logo]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[logo]">>)   -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[poster]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
 get_tmp_dir(_) -> <<"/tmp/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.

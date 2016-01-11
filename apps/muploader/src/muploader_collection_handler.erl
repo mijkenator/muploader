@@ -18,29 +18,37 @@ handle(Req, State) ->
 	;_ -> <<"unk_upload">>
     end,
 
-    SaveFileName = case proplists:get_value(<<"mkh_save_file_name">>, Ret) of
+    LogoFileName = case proplists:get_value(<<"mkh_logo_file">>, Ret) of
 	<<"/opt/mwd_admin", R/binary>> -> R
 	;R -> R
     end,
+    PosterFileName = case proplists:get_value(<<"mkh_poster_file">>, Ret) of
+	<<"/opt/mwd_admin", R1/binary>> -> R1
+	;R1 -> R1
+    end,
 
-    {ok, Req4} = reply(jiffy:encode({[{<<"type">>, Type}, {<<"status">>, <<"ok">>}, {<<"filename">>, SaveFileName}]}), Req2),   
+    {ok, Req4} = reply(jiffy:encode({[{<<"type">>, Type}, {<<"status">>, <<"ok">>}, {<<"logo">>, LogoFileName}, {<<"poster">>, PosterFileName}]}), Req2),   
     lager:debug("PH HANDLE4: ~p", [Req4]),
     {ok, Req4, State}.
 
 create_collection(Params) ->
 %[{<<"mkh_save_file_name">>,<<"/tmp/20151213_165122_c_8.JPG">>},{<<"mkh_save_file_name">>,<<"/tmp/20151213_165122_c_9.JPG">>},{<<"collection[name]">>,<<"asdsd">>},{<<"collection[designer]">>,<<"sdfsd">>},{<<"collection[link]">>,<<"asdasd212">>},{<<"collection[smallestSize]">>,<<"02">>},{<<"collection[largestSize]">>,<<"06">>},{<<"collection[price]">>,<<"$250 - $500 ">>},{<<"collection[season]">>,<<"Fall">>},{<<"collection[year]">>,<<"2016">>}]
-    [CN,D,L,SS,LS,P,Se,Y,Logo0] = [proplists:get_value(X, Params, <<>>) || X <- [
+    [CN,D,L,SS,LS,P,Se,Y,Logo0,Poster0] = [proplists:get_value(X, Params, <<>>) || X <- [
         					  <<"collection[name]">>,
         					  <<"collection[designer]">>,
         					  <<"collection[link]">>,
           					  <<"collection[smallestSize]">>,<<"collection[largestSize]">>,
         					  <<"collection[price]">>,<<"collection[season]">>,
-						  <<"collection[year]">>, <<"mkh_save_file_name">>]],
+						  <<"collection[year]">>, <<"mkh_logo_file">>, <<"mkh_poster_file">>]],
     Logo = case Logo0 of
 	<<"/opt/mwd_admin", R/binary>> -> R
 	;_ -> Logo0
     end,
-    CcR = rpc:call('edapi@127.0.0.1', model_collection, create_collection, [CN,D,L,SS,LS,P,Se,Y,Logo]),
+    Poster = case Poster0 of
+	<<"/opt/mwd_admin", T/binary>> -> T
+	;_ -> Poster0
+    end,
+    CcR = rpc:call('edapi@127.0.0.1', model_collection, create_collection, [CN,D,L,SS,LS,P,Se,Y,Logo,Poster]),
     lager:debug("CreateCollection Ret: ~p", [CcR]),
     ok.
 
@@ -55,14 +63,19 @@ multipart(Req, A) ->
 		    lager:debug("mp FNL: ~p ~p", [FileInpName, Filename]),
 		    case FileInpName of
 			<<"collection[logo]">> ->
-			    SaveFileName = get_file_name(Filename, FileInpName),
-			    lager:debug("temporary file name: ~p", [SaveFileName]),
-			    Req3 = save_file(Req2, SaveFileName),
-			    {Req3 ,[{<<"mkh_save_file_name">>, SaveFileName}]};
+			    SaveFileName1 = get_file_name(Filename, FileInpName),
+			    lager:debug("temporary file name: ~p", [SaveFileName1]),
+			    Req3 = save_file(Req2, SaveFileName1),
+			    {Req3 ,[{<<"mkh_logo_file">>, SaveFileName1}]};
+			<<"collection[poster]">> ->
+			    SaveFileName2 = get_file_name(Filename, FileInpName),
+			    lager:debug("temporary file name: ~p", [SaveFileName2]),
+			    Req3 = save_file(Req2, SaveFileName2),
+			    {Req3 ,[{<<"mkh_poster_file">>, SaveFileName2}]};
 			_ -> 
-			    SaveFileName = get_file_name(Filename, FileInpName),
-			    lager:debug("temporary file name: ~p", [SaveFileName]),
-			    Req3 = save_file(Req2, SaveFileName),
+			    SaveFileName3 = get_file_name(Filename, FileInpName),
+			    lager:debug("temporary file name: ~p", [SaveFileName3]),
+			    Req3 = save_file(Req2, SaveFileName3),
 			    {Req3 ,[]}
 		    end
             end,
@@ -94,7 +107,7 @@ multipart(Req, A) ->
 %    {ok, Req4, State}.
 
 save_file(Req, FileName) ->
-    lager:debug("SAVEFILE1", []),
+    lager:debug("SAVEFILE1: ~p", [FileName]),
     {ok, IoDevice} = file:open(FileName, [write, binary]),
     lager:debug("SAVEFILE2", []),
     {ok, _, Req2}     = get_part_body(Req, IoDevice),
