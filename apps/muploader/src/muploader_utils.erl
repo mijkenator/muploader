@@ -6,12 +6,33 @@
     ,is_supported_image_format/1
     ,create_preview/2
     ,get_preview_options/0
+    ,tinyfile/1
 ]).
+
+
+tinyfile(<<"/opt/mwd_admin/images/", _/binary>> = FileName) when is_binary(FileName) ->
+    Fun = fun() ->
+    	lager:debug("MU TINY start ~p", [FileName]),
+	process_flag(trap_exit, true),
+	os:cmd("/home/ubuntu/work/tinify/tf.py '"++ binary_to_list(FileName) ++"'"),
+    	lager:debug("MU TINY end ~p", [FileName])
+    end,
+    spawn(Fun);
+tinyfile(_) -> ok.
+
 
 get_tmp_dir() -> <<"/tmp/">>.
 
-get_tmp_dir(<<"collection[logo]">>)   -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[poster]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[poster]">>)           -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[logoPoster]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[posterLogo]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[posterSeason]">>)     -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"collection[posterCollection]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(<<"dress[back]">>) 			-> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(<<"dress[front]">>) 		-> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(<<"file">>)		 		-> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(<<"coverimage">>)		 	-> <<"/opt/mwd_admin/images/usercovers/">>;
 get_tmp_dir(_) -> <<"/tmp/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.

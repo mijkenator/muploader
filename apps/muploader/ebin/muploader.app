@@ -1,0 +1,11 @@
+{application,muploader,
+             [{description,[]},
+              {vsn,"1"},
+              {registered,[]},
+              {applications,[kernel,stdlib,lager,cowboy]},
+              {mod,{muploader_app,[]}},
+              {env,[]},
+              {modules,[collection_item_handler,muploader_api_handler,
+                        muploader_app,muploader_collection_handler,
+                        muploader_handler,muploader_sup,muploader_utils,
+                        user_handler]}]}.
