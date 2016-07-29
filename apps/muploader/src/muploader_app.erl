@@ -12,11 +12,16 @@
 start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile([
         {'_', [
-            {"/muploader/uploader/[...]", muploader_handler, []}
-            ,{"/muploader/api/[...]", muploader_api_handler, []}
-            ,{"/collection/[...]", muploader_collection_handler, []}
-            ,{"/item/collection/[...]", collection_item_handler, []}
-            ,{"/user/img/[...]", user_handler, []}
+            {"/muploader/uploader/[...]"    , muploader_handler, []}
+            ,{"/muploader/api/[...]"        , muploader_api_handler, []}
+            ,{"/collection/[...]"           , muploader_collection_handler, []}
+            ,{"/item/collection/[...]"      , collection_item_handler, []}
+            ,{"/bmcollection/[...]"         , muploader_bmcollection_handler, []}
+            ,{"/item/bmcollection/[...]"    , bmcollection_item_handler, []}
+            ,{"/blog/category/[...]"        , blog_category_handler, []}
+            ,{"/blog/post/[...]"            , blog_post_handler, []}
+            ,{"/mbd/upload/[...]"           , mbd_upload_handler, []}
+            ,{"/user/img/[...]"             , user_handler, []}
             ,{"/[...]", cowboy_static, {dir, "../../priv_dir/html", [{mimetypes, cow_mimetypes, all}]}}
         ]}
     ]),

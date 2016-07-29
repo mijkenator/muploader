@@ -5,7 +5,9 @@
               {applications,[kernel,stdlib,lager,cowboy]},
               {mod,{muploader_app,[]}},
               {env,[]},
-              {modules,[collection_item_handler,muploader_api_handler,
-                        muploader_app,muploader_collection_handler,
-                        muploader_handler,muploader_sup,muploader_utils,
-                        user_handler]}]}.
+              {modules,[blog_category_handler,blog_post_handler,
+                        bmcollection_item_handler,collection_item_handler,
+                        mbd_upload_handler,muploader_api_handler,
+                        muploader_app,muploader_bmcollection_handler,
+                        muploader_collection_handler,muploader_handler,
+                        muploader_sup,muploader_utils,user_handler]}]}.

@@ -3,6 +3,7 @@
 -export([
     get_tmp_dir/0
     ,get_tmp_dir/1
+    ,get_tmp_dir/2
     ,is_supported_image_format/1
     ,create_preview/2
     ,get_preview_options/0
@@ -23,17 +24,37 @@ tinyfile(_) -> ok.
 
 get_tmp_dir() -> <<"/tmp/">>.
 
-get_tmp_dir(<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[poster]">>)           -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[logoPoster]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[posterLogo]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[posterSeason]">>)     -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"collection[posterCollection]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
-get_tmp_dir(<<"dress[back]">>) 			-> <<"/opt/mwd_admin/images/collection_items/">>;
-get_tmp_dir(<<"dress[front]">>) 		-> <<"/opt/mwd_admin/images/collection_items/">>;
-get_tmp_dir(<<"file">>)		 		-> <<"/opt/mwd_admin/images/collection_items/">>;
-get_tmp_dir(<<"coverimage">>)		 	-> <<"/opt/mwd_admin/images/usercovers/">>;
-get_tmp_dir(_) -> <<"/tmp/">>.
+get_tmp_dir(Name) -> get_tmp_dir(old, Name).
+get_tmp_dir(bm,<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"collection[poster]">>)           -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"collection[logoPoster]">>)       -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"collection[posterLogo]">>)       -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"collection[posterSeason]">>)     -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"collection[posterCollection]">>) -> <<"/opt/mwd_admin/images/bmcollection_logos/">>;
+get_tmp_dir(bm,<<"dress[back]">>) 			        -> <<"/opt/mwd_admin/images/bmcollection_items/">>;
+get_tmp_dir(bm,<<"dress[front]">>) 		            -> <<"/opt/mwd_admin/images/bmcollection_items/">>;
+get_tmp_dir(bm,<<"file">>)		 		            -> <<"/opt/mwd_admin/images/bmcollection_items/">>;
+
+get_tmp_dir(mbd,<<"file">>)		 		            -> <<"/opt/mybestday/images/u/">>;
+get_tmp_dir(mbd,<<"mbd_upload">>)		 		    -> <<"/opt/mybestday/images/u/">>;
+
+get_tmp_dir(_,<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"collection[poster]">>)           -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"collection[logoPoster]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"collection[posterLogo]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"collection[posterSeason]">>)     -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"collection[posterCollection]">>) -> <<"/opt/mwd_admin/images/collection_logos/">>;
+get_tmp_dir(_,<<"dress[back]">>) 			        -> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(_,<<"dress[front]">>) 		            -> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(_,<<"file">>)		 		            -> <<"/opt/mwd_admin/images/collection_items/">>;
+get_tmp_dir(_,<<"coverimage">>)		 	            -> <<"/opt/mwd_admin/images/usercovers/">>;
+get_tmp_dir(_,<<"blog_image">>)                   -> <<"/opt/mwd_admin/images/blog_category/">>;
+get_tmp_dir(_,<<"category[blog_image]">>)         -> <<"/opt/mwd_admin/images/blog_category/">>;
+get_tmp_dir(_,<<"post[image]">>)                  -> <<"/opt/mwd_admin/images/blog_post/">>;
+get_tmp_dir(_,<<"post[logo]">>)                   -> <<"/opt/mwd_admin/images/blog_post/">>;
+get_tmp_dir(_,<<"image">>)                        -> <<"/opt/mwd_admin/images/blog_post/">>;
+get_tmp_dir(_,<<"logo">>)                         -> <<"/opt/mwd_admin/images/blog_post/">>;
+get_tmp_dir(_,_) -> <<"/tmp/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.
 is_supported_image_format(ExtName) ->
