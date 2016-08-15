@@ -22,6 +22,7 @@ start(_StartType, _StartArgs) ->
             ,{"/blog/post/[...]"            , blog_post_handler, []}
             ,{"/mbd/upload/[...]"           , mbd_upload_handler, []}
             ,{"/mbd/ms/upload/[...]"        , mbd_ms_upload_handler, []}
+            ,{"/mbd/post/upload/[...]"      , mbd_post_upload_handler, []}
             ,{"/user/img/[...]"             , user_handler, []}
             ,{"/[...]", cowboy_static, {dir, "../../priv_dir/html", [{mimetypes, cow_mimetypes, all}]}}
         ]}
