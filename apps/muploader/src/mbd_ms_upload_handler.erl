@@ -18,19 +18,27 @@ handle(Req, State) ->
 	    _:_ -> {0,0}
     end,
     lager:debug("MBDMSU HANDLE AccountID: ~p", [{AccountID,IsAdmin}]),
-    
-    {Ret, Req2} = multipart(Req1, []),
-    lager:debug("BCH multipart ret: ~p", [Ret]),
-    XParams = [{<<"mkh_account_id">>, AccountID}, {<<"mkh_account_isadmin">>, IsAdmin}], 
-    save_upload(Ret ++ XParams),
+    case rpc:call('edapi@127.0.0.1', model_service_user, get_mbd_ms_uploads_count, [AccountID]) of
+        true ->
+            {Ret, Req2} = multipart(Req1, []),
+            lager:debug("BCH multipart ret: ~p", [Ret]),
+            XParams = [{<<"mkh_account_id">>, AccountID}, {<<"mkh_account_isadmin">>, IsAdmin}], 
+            save_upload(Ret ++ XParams),
 
-    Imgs = [R || {Key, <<"/opt/mybestday", R/binary>>}<- Ret, Key =:= <<"mkh_mbd_img">>],
+            Imgs = [R || {Key, <<"/opt/mybestday", R/binary>>}<- Ret, Key =:= <<"mkh_mbd_img">>],
 
-    {ok, Req4} = reply(jiffy:encode({[{<<"type">>, <<"main_slider_upload">>}, {<<"status">>, <<"ok">>}, 
-		{<<"images">>, 	Imgs}
-	]}), Req2),   
-    lager:debug("PH HANDLE4: ~p", [Req4]),
-    {ok, Req4, State}.
+            {ok, Req4} = reply(jiffy:encode({[{<<"type">>, <<"main_slider_upload">>}, {<<"status">>, <<"ok">>}, 
+                {<<"images">>, 	Imgs}
+            ]}), Req2),   
+            lager:debug("PH HANDLE4: ~p", [Req4]),
+            {ok, Req4, State};
+        _ ->
+            {ok, Req5} = reply(jiffy:encode({[{<<"type">>, <<"main_slider_upload">>}, {<<"status">>, <<"failed">>}, 
+                {<<"images">>, 	<<"reached limit">>}
+            ]}), Req1),   
+            lager:debug("PH HANDLE4: ~p", [Req5]),
+            {ok, Req5, State}
+    end.
 
 save_upload(Params) ->
     AccountID = proplists:get_value(<<"mkh_account_id">>, Params, 0),  
