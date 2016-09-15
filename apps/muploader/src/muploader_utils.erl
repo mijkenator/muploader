@@ -11,6 +11,8 @@
 ]).
 
 
+tinyfile(<<"/opt/mwd_admin/images/blog_category", _/binary>>) -> ok;
+tinyfile(<<"/opt/mwd_admin/images/blog_post", _/binary>>) -> ok;
 tinyfile(<<"/opt/mwd_admin/images/", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY start ~p", [FileName]),
