@@ -102,7 +102,7 @@ save_file(Req, FileName) ->
     lager:debug("SAVEFILE3", []),
     file:close(IoDevice),
     lager:debug("SAVEFILE DONE."),
-    %muploader_utils:tinyfile(FileName),
+    muploader_utils:tinyfile(FileName),
     Req2.
 
 -spec get_file_name(binary(), binary()) -> binary().
