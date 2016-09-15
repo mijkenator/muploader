@@ -16,32 +16,32 @@ tinyfile(<<"/opt/mwd_admin/images/blog_post", _/binary>>)     -> ok;
 tinyfile(<<"/opt/mybestday/images/u/posts", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY MBD600 start ~p", [FileName]),
-	process_flag(trap_exit, true),
-	os:cmd("/home/ubuntu/work/tinify/tf_mbd600.py '"++ binary_to_list(FileName) ++"'"),
+	    process_flag(trap_exit, true),
+	    os:cmd("/home/ubuntu/work/tinify/tf_mbd600.py '"++ binary_to_list(FileName) ++"'"),
     	lager:debug("MU TINY MBD600 end ~p", [FileName])
     end,
     spawn(Fun);
 tinyfile(<<"/opt/mybestday/images/u/slide", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY MBD2000 start ~p", [FileName]),
-	process_flag(trap_exit, true),
-	os:cmd("/home/ubuntu/work/tinify/tf_mbd2000.py '"++ binary_to_list(FileName) ++"'"),
+	    process_flag(trap_exit, true),
+	    os:cmd("/home/ubuntu/work/tinify/tf_mbd2000.py '"++ binary_to_list(FileName) ++"'"),
     	lager:debug("MU TINY MBD2000 end ~p", [FileName])
     end,
     spawn(Fun);
 tinyfile(<<"/opt/mybestday/images/u", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY MBD180 start ~p", [FileName]),
-	process_flag(trap_exit, true),
-	os:cmd("/home/ubuntu/work/tinify/tf_mbd180.py '"++ binary_to_list(FileName) ++"'"),
+	    process_flag(trap_exit, true),
+	    os:cmd("/home/ubuntu/work/tinify/tf_mbd180.py '"++ binary_to_list(FileName) ++"'"),
     	lager:debug("MU TINY MBD180 end ~p", [FileName])
     end,
     spawn(Fun);
 tinyfile(<<"/opt/mwd_admin/images/", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
-    	lager:debug("MU TINY start ~p", 
-	process_flag(trap_exit, true),
-	os:cmd("/home/ubuntu/work/tinify/tf.py '"++ binary_to_list(FileName) ++"'"),
+    	lager:debug("MU TINY start ~p", [FileName]),
+	    process_flag(trap_exit, true),
+	    os:cmd("/home/ubuntu/work/tinify/tf.py '"++ binary_to_list(FileName) ++"'"),
     	lager:debug("MU TINY end ~p", [FileName])
     end,
     spawn(Fun);
