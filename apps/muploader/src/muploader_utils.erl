@@ -17,7 +17,7 @@ tinyfile(<<"/opt/mybestday/images/u/posts", _/binary>> = FileName) when is_binar
     Fun = fun() ->
     	lager:debug("MU TINY MBD600 start ~p", [FileName]),
 	    process_flag(trap_exit, true),
-	    os:cmd("/home/ubuntu/work/tinify/tf_mbd600.py '"++ binary_to_list(FileName) ++"'"),
+	    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 600"),
     	lager:debug("MU TINY MBD600 end ~p", [FileName])
     end,
     spawn(Fun);
@@ -27,6 +27,8 @@ tinyfile(<<"/opt/mybestday/images/u/slide", _/binary>> = FileName) when is_binar
 	    process_flag(trap_exit, true),
 	    os:cmd("/home/ubuntu/work/tinify/tf_mbd2000.py '"++ binary_to_list(FileName) ++"'"),
     	lager:debug("MU TINY MBD2000 end ~p", [FileName])
+
+        %identify /opt/mybestday/images/u/01.jpg | awk '{print $3}'
     end,
     spawn(Fun);
 tinyfile(<<"/opt/mybestday/images/u", _/binary>> = FileName) when is_binary(FileName) ->
