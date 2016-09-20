@@ -11,7 +11,8 @@ def do_job(origin_file, width):
     dst_path     = str(os.path.dirname(origin_file)) + '/p_i/'
     base_name    = str(os.path.basename(origin_file))
     file_name, file_extension = os.path.splitext(base_name)
-    opt_origin = dst_path + base_name
+    #opt_origin = dst_path + base_name
+    opt_origin = dst_path + file_name + "_" + str(width) + file_extension
 
     #print( 'File:', str(origin_file))
     #print( 'Path:', dst_path)
@@ -94,8 +95,12 @@ if __name__ == "__main__":
     (engine, db, metadata) = get_db()
     if sys.argv[2] == '600':
         save_picture_params(db, metadata,  sys.argv[1], jret, 0)
+        tmpr = do_job(sys.argv[1], 2000)
+        tmpr = do_job(sys.argv[1], 180)
     elif sys.argv[2] == '2000':
         save_mbdms_upload(db, metadata, sys.argv[1], jret, 0)
+        tmpr = do_job(sys.argv[1], 600)
+        tmpr = do_job(sys.argv[1], 180)
     else:
         print("unknown width, saving ignored")
 
