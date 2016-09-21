@@ -94,13 +94,13 @@ if __name__ == "__main__":
     print(jret)
     (engine, db, metadata) = get_db()
     if sys.argv[2] == '600':
-        save_picture_params(db, metadata,  sys.argv[1], jret, 0)
         tmpr = do_job(sys.argv[1], 2000)
         tmpr = do_job(sys.argv[1], 180)
+        save_picture_params(db, metadata,  sys.argv[1], jret, 0)
     elif sys.argv[2] == '2000':
-        save_mbdms_upload(db, metadata, sys.argv[1], jret, 0)
         tmpr = do_job(sys.argv[1], 600)
         tmpr = do_job(sys.argv[1], 180)
+        save_mbdms_upload(db, metadata, sys.argv[1], jret, 0)
     else:
         print("unknown width, saving ignored")
 
