@@ -30,7 +30,10 @@ def do_job(origin_file, width):
         ratio = xsize / width
     print("x:%s , y:%s , w:%s , r:%s" % (xsize, ysize, width, ratio))
     y     = int(ysize / ratio)
-    im.resize((width, y)).save(opt_origin)
+    if file_extension is None or file_extension == '':
+        im.resize((width, y)).save(opt_origin, "JPEG")
+    else:
+        im.resize((width, y)).save(opt_origin)
 
     im = PrimaryColors(image=opt_origin, max_colors=5)
     colors = []
@@ -79,7 +82,7 @@ def save_mbdms_upload(db, metadata, fname, jret, tcount):
     rcount = 0
     for row in rs:
         rcount += 1
-        print("%s %s %s" % (row[mmu.c.id], row[mmu.c.img]))
+        print("%s %s" % (row[mmu.c.id], row[mmu.c.img]))
         us = mmu.update().where(mmu.c.id==row[mmu.c.id]).values(extra=jret)
         db.execute(us)
 
