@@ -2,7 +2,7 @@
 
 -export([init/3]).
 -export([handle/2, save_file/2]).
--export([terminate/3]).
+-export([terminate/3, get_file_name/2]).
 
 init(_Type, Req, []) ->
 	{ok, Req, undefined}.
