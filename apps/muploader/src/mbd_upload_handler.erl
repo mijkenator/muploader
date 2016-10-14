@@ -23,7 +23,9 @@ handle(Req, State) ->
     lager:debug("BCH multipart ret: ~p", [Ret]),
     Type = case cowboy_req:path(Req) of
         {<<"/mbd/upload/groom">>, _} -> <<"groom">>;
-        {<<"/mbd/upload/bride">>, _} -> <<"bride">>
+        {<<"/mbd/upload/bride">>, _} -> <<"bride">>;
+        {<<"/mbd/upload/p1">>, _} -> <<"p1">>;
+        {<<"/mbd/upload/p2">>, _} -> <<"p2">>
         ;_ -> <<"groom">>
     end,
     XParams = [{<<"mkh_account_id">>, AccountID}, {<<"mkh_account_isadmin">>, IsAdmin}, {<<"upload_type">>, Type}], 
