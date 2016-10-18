@@ -44,16 +44,17 @@ save_upload(Params) ->
     AccountID = proplists:get_value(<<"mkh_account_id">>, Params, 0),  
     IsAdmin   = proplists:get_value(<<"mkh_account_isadmin">>, Params, 0),
     lager:debug("AID ~p, IsAdm ~p",[AccountID, IsAdmin]),
-    Fn = fun(R) ->
+    Fn = fun({R, OrderNumber}) ->
         case {AccountID, IsAdmin} of
             {Aid, _} when is_integer(Aid), Aid>0 ->
                 lager:debug("SAVE ms upload :: ~p", [{AccountID, R, <<"">>}]),
-                CcR = rpc:call('edapi@127.0.0.1', model_service_user, save_ms_upload, [AccountID, R, <<>>]),
+                CcR = rpc:call('edapi@127.0.0.1', model_service_user, save_ms_upload, [AccountID, R, <<>>, OrderNumber]),
                 lager:debug("SAve ms upload Ret: ~p", [CcR]);
             _ -> ok
         end
     end,
-    lists:foreach(Fn, [R || {Key, <<"/opt/mybestday", R/binary>>}<- Params, Key =:= <<"mkh_mbd_img">>]),
+    OrderNumber = proplists:get_value(<<"order_number">>, Params, 0),
+    lists:foreach(Fn, [{R,OrderNumber} || {Key, <<"/opt/mybestday", R/binary>>}<- Params, Key =:= <<"mkh_mbd_img">>]),
     ok.
 
 
