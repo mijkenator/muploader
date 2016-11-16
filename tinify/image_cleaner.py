@@ -116,7 +116,7 @@ def check_mbd_event_posts(conn):
                 #no optimized images, produce it
                 print("Making optimizing images")
                 if test_pipe(fname):
-                    call(["/home/ubuntu/work/tinify/tf_mbd.py", dir1+fname, '600'])
+                    call(["/home/ubuntu/work/tinify/tf_mbd.py", dir1+fname, '780'])
     return True
 
 def check_blogpost(conn):

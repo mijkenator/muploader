@@ -17,6 +17,6 @@ print( "FN: %s FE:%s " % (file_name, file_extension) )
 opt_origin = dst_path + base_name
 tinify.from_file(origin_file).to_file(opt_origin)
 
-tinify.from_file(opt_origin).resize(method="scale",width=600).to_file(dst_path + file_name + "_600" + file_extension)
+tinify.from_file(opt_origin).resize(method="scale",width=780).to_file(dst_path + file_name + "_780" + file_extension)
 
 
