@@ -19,7 +19,7 @@ handle(Req, State) ->
     end,
     lager:debug("MBDPU HANDLE AccountID: ~p", [{AccountID,IsAdmin}]),
     
-    {Ret, Req2} = multipart(Req1, []),
+    {Ret, Req2} = multipart(Req1, [], AccountID),
     lager:debug("MPBDPU multipart ret: ~p", [Ret]),
     Type = case cowboy_req:path(Req) of
         {<<"/mbd/post/upload/new">>, _} -> <<"new">>;
@@ -67,7 +67,11 @@ save_upload(Params) ->
 
 
 
-multipart(Req, A) ->
+multipart(Req, A, AccountID) ->
+    UID = case AccountID of
+        AID when is_integer(AID),AID>0 -> list_to_binary(integer_to_list(AID)++"/")
+        ;_ -> <<"">>
+    end,
     case cowboy_req:part(Req) of
         {ok, Headers, Req2} ->
             {Req4,AP} = case cow_multipart:form_data(Headers) of
@@ -78,24 +82,30 @@ multipart(Req, A) ->
 		    lager:debug("mp BCH FNL: ~p ~p", [FileInpName, Filename]),
 		    case FileInpName of
 			 FIN when FIN=:=<<"mbd_upload">>;FIN=:=<<"file">> ->
-			    SaveFileName1 = get_file_name(Filename, FileInpName),
+			    %SaveFileName1 = get_file_name(Filename, FileInpName),
+                SaveFileName1 = get_file_name(<<UID/binary,Filename/binary>>, FileInpName),
 			    lager:debug("temporary file name: ~p", [SaveFileName1]),
 			    Req3 = save_file(Req2, SaveFileName1),
 			    {Req3 ,[{<<"mkh_mbd_img">>, SaveFileName1}]};
 			_ -> 
-			    SaveFileName3 = get_file_name(Filename, FileInpName),
+			    %SaveFileName3 = get_file_name(Filename, FileInpName),
+                SaveFileName3 = get_file_name(<<UID/binary,Filename/binary>>, FileInpName),
 			    lager:debug("temporary file name: ~p", [SaveFileName3]),
 			    Req3 = save_file(Req2, SaveFileName3),
 			    {Req3 ,[]}
 		    end
             end,
-            multipart(Req4, A++AP);
+            multipart(Req4, A++AP, AccountID);
         {done, Req2} -> {A, Req2}
     end.
 
 
 save_file(Req, FileName) ->
     lager:debug("SAVEFILE1: ~p", [FileName]),
+    D1 = filename:dirname(FileName),
+    D2 = <<D1/binary, "/p_i">>,
+    file:make_dir(D1),
+    file:make_dir(D2),
     {ok, IoDevice} = file:open(FileName, [write, binary]),
     lager:debug("SAVEFILE2", []),
     {ok, _, Req2}     = get_part_body(Req, IoDevice),

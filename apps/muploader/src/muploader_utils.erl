@@ -17,7 +17,7 @@ tinyfile(<<"/opt/mybestday/images/u/posts", _/binary>> = FileName) when is_binar
     Fun = fun() ->
     	lager:debug("MU TINY MBD600 start ~p", [FileName]),
 	    process_flag(trap_exit, true),
-	    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 600"),
+	    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 780"),
     	lager:debug("MU TINY MBD600 end ~p", [FileName])
     end,
     spawn(Fun);
