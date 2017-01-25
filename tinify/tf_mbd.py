@@ -68,9 +68,12 @@ def extra_resizes(origin_file):
     base_name    = str(os.path.basename(origin_file))
     file_name, file_extension = os.path.splitext(base_name)
 
-    opt_origin    = dst_path + file_name + "_2000" + file_extension
-    opt_origin_wp = dst_path + file_name + "_2000" + '.webp'
-    subprocess.getoutput("cwebp -q 90 %s -o %s" % (opt_origin, opt_origin_wp))
+    #opt_origin    = dst_path + file_name + "_2000" + file_extension
+    #opt_origin_wp = dst_path + file_name + "_2000" + '.webp'
+    #subprocess.getoutput("cwebp -q 90 %s -o %s" % (opt_origin, opt_origin_wp))
+    opt_origin    = origin_file
+    opt_origin_wp = dst_path + file_name + '.webp'
+    subprocess.getoutput("cwebp -q 80 %s -o %s" % (opt_origin, opt_origin_wp))
     for width in [1500,1000,800,700,600,500,400,300,200]:
         opt_dst    = dst_path + file_name + "_" + str(width) + file_extension
         opt_dst_wp = dst_path + file_name + "_" + str(width) + '.webp'
@@ -85,12 +88,15 @@ def extra_resizes(origin_file):
         y     = int(ysize / ratio)
         #im.resize((width, y)).save(opt_dst)
         if file_extension is None or file_extension == '':
-            im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
+            #im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
+            im.resize((width, y)).save(opt_dst)
         elif file_extension.lower() == '.jpg' or file_extension.lower() == '.jpeg':
-            im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
+            #im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
+            im.resize((width, y)).save(opt_dst)
         else:
             im.resize((width, y)).save(opt_dst)
-        webpcmd = "cwebp -q 90 %s -o %s" % (opt_origin, opt_dst_wp)
+        #webpcmd = "cwebp -q 90 %s -o %s" % (opt_origin, opt_dst_wp)
+        webpcmd = "cwebp -q 80 %s -o %s" % (opt_origin, opt_dst_wp)
         subprocess.getoutput(webpcmd)
 
 
