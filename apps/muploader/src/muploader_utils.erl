@@ -14,23 +14,25 @@
 tinyfile(<<"/opt/mwd_admin/images/blog_category", _/binary>>) -> ok;
 tinyfile(<<"/opt/mwd_admin/images/blog_post", _/binary>>)     -> ok;
 tinyfile(<<"/opt/mybestday/images/u/posts", _/binary>> = FileName) when is_binary(FileName) ->
-    Fun = fun() ->
-    	lager:debug("MU TINY MBD600 start ~p", [FileName]),
-	    process_flag(trap_exit, true),
-	    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 780"),
-    	lager:debug("MU TINY MBD600 end ~p", [FileName])
-    end,
-    spawn(Fun);
+    %Fun = fun() ->
+    %	lager:debug("MU TINY MBD600 start ~p", [FileName]),
+	%    process_flag(trap_exit, true),
+	%    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 780"),
+    % 	lager:debug("MU TINY MBD600 end ~p", [FileName])
+    %end,
+    %spawn(Fun);
+    ok; %now optimizing on remote
 tinyfile(<<"/opt/mybestday/images/u/slide", _/binary>> = FileName) when is_binary(FileName) ->
-    Fun = fun() ->
-    	lager:debug("MU TINY MBD2000 start ~p", [FileName]),
-	    process_flag(trap_exit, true),
-	    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 2000"),
-    	lager:debug("MU TINY MBD2000 end ~p", [FileName])
+    %Fun = fun() ->
+    % 	lager:debug("MU TINY MBD2000 start ~p", [FileName]),
+	%    process_flag(trap_exit, true),
+	%    os:cmd("/home/ubuntu/work/tinify/tf_mbd.py '"++ binary_to_list(FileName) ++"' 2000"),
+    % 	lager:debug("MU TINY MBD2000 end ~p", [FileName])
 
-        %identify /opt/mybestday/images/u/01.jpg | awk '{print $3}'
-    end,
-    spawn(Fun);
+    %    %identify /opt/mybestday/images/u/01.jpg | awk '{print $3}'
+    %end,
+    %spawn(Fun);
+    ok; %now optimizing on remote
 tinyfile(<<"/opt/mybestday/images/u", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY MBD180 start ~p", [FileName]),
