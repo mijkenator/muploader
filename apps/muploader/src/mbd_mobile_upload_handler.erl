@@ -101,6 +101,8 @@ save_file(Req, FileName) ->
     D2 = <<D1/binary, "/p_i">>,
     file:make_dir(D1),
     file:make_dir(D2),
+    file:change_mode(D1, 8#777),
+    file:change_mode(D2, 8#777),
     {ok, IoDevice} = file:open(FileName, [write, binary]),
     lager:debug("SAVEFILE2", []),
     {ok, _, Req2}     = get_part_body(Req, IoDevice),

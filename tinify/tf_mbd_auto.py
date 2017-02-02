@@ -117,11 +117,11 @@ def extra_resizes(origin_file):
         y     = int(ysize / ratio)
         #im.resize((width, y)).save(opt_dst)
         if file_extension is None or file_extension == '':
-            #im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
-            im.resize((width, y)).save(opt_dst)
+            im.resize((width, y)).save(opt_dst, format='JPEG', quality=80, optimize=True)
+            #im.resize((width, y)).save(opt_dst)
         elif file_extension.lower() == '.jpg' or file_extension.lower() == '.jpeg':
-            #im.resize((width, y)).save(opt_dst, format='JPEG', quality=100, optimize=True)
-            im.resize((width, y)).save(opt_dst)
+            im.resize((width, y)).save(opt_dst, format='JPEG', quality=80, optimize=True)
+            #im.resize((width, y)).save(opt_dst)
         else:
             im.resize((width, y)).save(opt_dst)
         ##webpcmd = "cwebp -q 90 %s -o %s" % (opt_origin, opt_dst_wp)
@@ -155,8 +155,8 @@ def do_job(origin_file, width):
     if file_extension is None or file_extension == '':
         im.resize((width, y)).save(opt_origin, format='JPEG', quality=80)
     elif file_extension == '.jpg' or file_extension == '.JPG':
-        #im.resize((width, y)).save(opt_origin, format='JPEG', quality=80, optimize=True)
-        im.resize((width, y)).save(opt_origin)
+        im.resize((width, y)).save(opt_origin, format='JPEG', quality=80, optimize=True)
+        #im.resize((width, y)).save(opt_origin)
     else:
         im.resize((width, y)).save(opt_origin)
 
@@ -176,7 +176,7 @@ def do_job(origin_file, width):
 
 def get_db():
     try:
-        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@localhost/edapi')
+        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@34.198.91.198/edapi')
         conn = engine.connect()
         metadata = MetaData(bind=engine)
     except:
@@ -224,16 +224,17 @@ def save_mbdms_upload(db, metadata, fname, jret, tcount, gpsi, ctimev):
 def copy_file_from_main(oimg):
     ret = tempfile.TemporaryDirectory(dir='/tmp')
     subprocess.getoutput("mkdir %s/p_i" % ret.name)
-    scpr = subprocess.getoutput("scp -i /root/.ssh/edapi.pem ubuntu@52.6.107.224:%s %s" % (oimg, ret.name))
-    #print("scpr ret: %s" % scpr)
+    scpr = subprocess.getoutput("scp -i /root/edapi.pem ubuntu@34.198.91.198:%s %s" % (oimg, ret.name))
+    print("scpr ret: %s" % scpr)
     img = ret.name + "/" + os.path.basename(oimg)
-    #print(ret.name)
+    print(ret.name)
     return (ret, img)
 
-def copy_resuls(tmp_dobject, oimg):
+def copy_results(tmp_dobject, oimg):
     ddir = os.path.dirname(oimg) + "/p_i"
     sdir = tmp_dobject.name + '/p_i/*'
-    scpr = subprocess.getoutput("scp -i /root/.ssh/edapi.pem %s ubuntu@52.6.107.224:%s" % (sdir, ddir))
+    print("copy results: %s -> %s" % (sdir, ddir))
+    scpr = subprocess.getoutput("scp -i /root/edapi.pem %s ubuntu@34.198.91.198:%s" % (sdir, ddir))
 
 if __name__ == "__main__":
     orig_img_name = sys.argv[1]
@@ -242,7 +243,7 @@ if __name__ == "__main__":
 
     print(subprocess.getoutput("ls -la %s" % tmp_dobject.name))
 
-    exit(0)
+    #exit(0)
 
     ret = do_job(img_name, int(sys.argv[2]))
     job_id = sys.argv[3]
@@ -265,9 +266,13 @@ if __name__ == "__main__":
         extra_resizes(img_name)
         #extra_resizes_magick(sys.argv[1])
         save_mbdms_upload(db, metadata, orig_img_name, jret, 0, gpsi, ctime)
+    elif sys.argv[2] == 'mbdbg':
+        tmpr = do_job(img_name, 780)
+        tmpr = do_job(img_name, 180)
+        extra_resizes(img_name)
     else:
         print("unknown width, saving ignored")
 
     copy_results(tmp_dobject, orig_img_name)
-    db.engine.execute("update img_converter_queue set status=%s order where id=%s" % (2, job_id))
+    db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
 
