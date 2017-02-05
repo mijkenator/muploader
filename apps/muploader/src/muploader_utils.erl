@@ -33,6 +33,7 @@ tinyfile(<<"/opt/mybestday/images/u/slide", _/binary>> = FileName) when is_binar
     %end,
     %spawn(Fun);
     ok; %now optimizing on remote
+tinyfile(<<"/opt/mybestday/images/u/bg", _/binary>> = FileName) when is_binary(FileName) -> ok;
 tinyfile(<<"/opt/mybestday/images/u", _/binary>> = FileName) when is_binary(FileName) ->
     Fun = fun() ->
     	lager:debug("MU TINY MBD180 start ~p", [FileName]),

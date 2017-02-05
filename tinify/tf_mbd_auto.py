@@ -68,9 +68,11 @@ def extra_resizes_magick(origin_file):
     base_name    = str(os.path.basename(origin_file))
     file_name, file_extension = os.path.splitext(base_name)
 
+    opt_origin    = dst_path + file_name + "_2000" + file_extension
+    opt_origin_wp = dst_path + file_name + "_2000" + '.webp'
+    subprocess.getoutput("cwebp -q 90 %s -o %s" % (opt_origin, opt_origin_wp))
     opt_origin    = origin_file
     opt_origin_wp = dst_path + file_name + '.webp'
-    #subprocess.getoutput("cwebp -q 80 %s -o %s" % (opt_origin, opt_origin_wp))
     for width in [1500,1000,800,700,600,500,400,300,200]:
         opt_dst    = dst_path + file_name + "_" + str(width) + file_extension
         opt_dst_wp = dst_path + file_name + "_" + str(width) + '.webp'
@@ -87,19 +89,19 @@ def extra_resizes_magick(origin_file):
         geometr = "%sx%s" % (width, y)
         convert_cmd="convert %s -filter Triangle -define filter:support=2 -resize %s -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB %s" % (opt_origin, geometr, opt_dst)
         cmdret = subprocess.getoutput(convert_cmd)
-        #print(cmdret)
+        print(cmdret)
 
-        #webpcmd = "cwebp -q 80 %s -o %s" % (opt_origin, opt_dst_wp)
-        #subprocess.getoutput(webpcmd)
+        webpcmd = "cwebp -q 80 %s -o %s" % (opt_dst, opt_dst_wp)
+        subprocess.getoutput(webpcmd)
 
 def extra_resizes(origin_file):
     dst_path     = str(os.path.dirname(origin_file)) + '/p_i/'
     base_name    = str(os.path.basename(origin_file))
     file_name, file_extension = os.path.splitext(base_name)
 
-    #opt_origin    = dst_path + file_name + "_2000" + file_extension
-    #opt_origin_wp = dst_path + file_name + "_2000" + '.webp'
-    #subprocess.getoutput("cwebp -q 90 %s -o %s" % (opt_origin, opt_origin_wp))
+    opt_origin    = dst_path + file_name + "_2000" + file_extension
+    opt_origin_wp = dst_path + file_name + "_2000" + '.webp'
+    subprocess.getoutput("cwebp -q 90 %s -o %s" % (opt_origin, opt_origin_wp))
     opt_origin    = origin_file
     opt_origin_wp = dst_path + file_name + '.webp'
     #subprocess.getoutput("cwebp -q 80 %s -o %s" % (opt_origin, opt_origin_wp))
@@ -117,16 +119,17 @@ def extra_resizes(origin_file):
         y     = int(ysize / ratio)
         #im.resize((width, y)).save(opt_dst)
         if file_extension is None or file_extension == '':
-            im.resize((width, y)).save(opt_dst, format='JPEG', quality=80, optimize=True)
+            im.resize((width, y)).save(opt_dst, format='JPEG', quality=85, optimize=True)
             #im.resize((width, y)).save(opt_dst)
         elif file_extension.lower() == '.jpg' or file_extension.lower() == '.jpeg':
-            im.resize((width, y)).save(opt_dst, format='JPEG', quality=80, optimize=True)
+            im.resize((width, y)).save(opt_dst, format='JPEG', quality=85, optimize=True)
             #im.resize((width, y)).save(opt_dst)
         else:
-            im.resize((width, y)).save(opt_dst)
+            im.resize((width, y)).save(opt_dst, format='JPEG', quality=85, optimize=True)
+            #im.resize((width, y)).save(opt_dst)
         ##webpcmd = "cwebp -q 90 %s -o %s" % (opt_origin, opt_dst_wp)
-        #webpcmd = "cwebp -q 80 %s -o %s" % (opt_origin, opt_dst_wp)
-        #subprocess.getoutput(webpcmd)
+        webpcmd = "cwebp -q 80 %s -o %s" % (opt_dst, opt_dst_wp)
+        subprocess.getoutput(webpcmd)
 
 
 def do_job(origin_file, width):
@@ -245,7 +248,9 @@ if __name__ == "__main__":
 
     #exit(0)
 
-    ret = do_job(img_name, int(sys.argv[2]))
+    sysargv2 = sys.argv[2]
+    if sys.argv[2] == 'mbdbg': sysargv2 = '780'
+    ret = do_job(img_name, int(sysargv2))
     job_id = sys.argv[3]
     
     gpsi  = ret.pop('gps', "")
@@ -257,17 +262,17 @@ if __name__ == "__main__":
     if sys.argv[2] == '780':
         tmpr = do_job(img_name, 2000)
         tmpr = do_job(img_name, 180)
-        extra_resizes(img_name)
-        #extra_resizes_magick(sys.argv[1])
+        #extra_resizes(img_name)
+        extra_resizes_magick(img_name)
         save_picture_params(db, metadata,  orig_img_name, jret, 0, gpsi, ctime)
     elif sys.argv[2] == '2000':
         tmpr = do_job(img_name, 780)
         tmpr = do_job(img_name, 180)
-        extra_resizes(img_name)
-        #extra_resizes_magick(sys.argv[1])
+        #extra_resizes(img_name)
+        extra_resizes_magick(img_name)
         save_mbdms_upload(db, metadata, orig_img_name, jret, 0, gpsi, ctime)
     elif sys.argv[2] == 'mbdbg':
-        tmpr = do_job(img_name, 780)
+        tmpr = do_job(img_name, 2000)
         tmpr = do_job(img_name, 180)
         extra_resizes(img_name)
     else:

@@ -99,7 +99,7 @@ def main():
     global my_logger
     global max_jobs
     global threadLock
-    max_jobs = 50
+    max_jobs = 75
 
     context = daemon.DaemonContext(
         working_directory='/tmp',
