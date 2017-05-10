@@ -8,6 +8,7 @@ init(_Type, Req, []) ->
 	{ok, Req, undefined}.
 
 handle(Req, State) ->
+    lager:debug("MUH", []),
     lager:debug("PH HANDLE: ~p ~p", [Req, State]),
 
     {ok, Headers, Req2} = cowboy_req:part(Req),

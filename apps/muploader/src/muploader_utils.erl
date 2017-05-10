@@ -2,12 +2,15 @@
 
 -export([
     get_tmp_dir/0
+    ,get_tmp_dir/2
     ,is_supported_image_format/1
     ,create_preview/2
     ,get_preview_options/0
 ]).
 
 get_tmp_dir() -> <<"/tmp/">>.
+get_tmp_dir(logo,_) -> <<"/home/ubuntu/work/coleman/html/uploads/logo/">>;
+get_tmp_dir(_,_) -> <<"/home/ubuntu/work/coleman/html/media/mp3/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.
 is_supported_image_format(ExtName) ->
@@ -34,4 +37,5 @@ create_preview(NameTo, NameFrom) ->
     Ret = os:cmd(binary_to_list(Cmd)),
     lager:debug("Convert ret: ~p", [Ret]),
     true.
+
 
