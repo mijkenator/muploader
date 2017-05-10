@@ -25,7 +25,7 @@ handle(Req, State) ->
     save_upload(Ret ++ XParams),
 
     Mp3 = case proplists:get_value(<<"mkh_mp3_file">>, Ret) of
-        <<"/home/ubuntu/work/coleman/html/uploads/logo/", R/binary>> -> R
+        <<"/home/ubuntu/work/dev2_coleman/html/uploads/logo/", R/binary>> -> R
         ;R -> R
     end,
 
@@ -36,7 +36,7 @@ handle(Req, State) ->
 save_upload(Params) ->
     [Mp3] = [proplists:get_value(X, Params, <<>>) || X <- [<<"mkh_mp3_file">>]],
     FI = case Mp3 of
-            <<"/home/ubuntu/work/coleman/html/uploads/logo/", R/binary>> -> R
+            <<"/home/ubuntu/work/dev2_coleman/html/uploads/logo/", R/binary>> -> R
             ;_ -> Mp3
     end,
 

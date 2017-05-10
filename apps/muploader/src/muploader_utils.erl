@@ -9,8 +9,8 @@
 ]).
 
 get_tmp_dir() -> <<"/tmp/">>.
-get_tmp_dir(logo,_) -> <<"/home/ubuntu/work/coleman/html/uploads/logo/">>;
-get_tmp_dir(_,_) -> <<"/home/ubuntu/work/coleman/html/media/mp3/">>.
+get_tmp_dir(logo,_) -> <<"/home/ubuntu/work/dev2_coleman/html/uploads/logo/">>;
+get_tmp_dir(_,_) -> <<"/home/ubuntu/work/dev2_coleman/html/media/mp3/">>.
 
 -spec is_supported_image_format(binary()) -> true|false.
 is_supported_image_format(ExtName) ->
