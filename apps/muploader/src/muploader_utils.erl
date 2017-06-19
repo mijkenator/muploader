@@ -72,6 +72,9 @@ get_tmp_dir(mbdms,_)		             		    -> <<"/opt/mybestday/images/u/slide/">>
 get_tmp_dir(mbdbg,_)		             		    -> <<"/opt/mybestday/images/u/bg/">>;
 get_tmp_dir(mbdpost,_)		             		    -> <<"/opt/mybestday/images/u/posts/">>;
 
+get_tmp_dir(track,_)                                -> <<"/opt/mybestday/images/u/strack/">>;
+
+
 get_tmp_dir(_,<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/collection_logos/">>;
 get_tmp_dir(_,<<"collection[poster]">>)           -> <<"/opt/mwd_admin/images/collection_logos/">>;
 get_tmp_dir(_,<<"collection[logoPoster]">>)       -> <<"/opt/mwd_admin/images/collection_logos/">>;

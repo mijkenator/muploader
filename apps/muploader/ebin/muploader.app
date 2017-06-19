@@ -12,4 +12,5 @@
                         mbd_upload_handler,muploader_api_handler,
                         muploader_app,muploader_bmcollection_handler,
                         muploader_collection_handler,muploader_handler,
-                        muploader_sup,muploader_utils,user_handler]}]}.
+                        muploader_sup,muploader_utils,track_cover_handler,
+                        user_handler]}]}.

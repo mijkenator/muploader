@@ -20,6 +20,7 @@ start(_StartType, _StartArgs) ->
             ,{"/item/bmcollection/[...]"    , bmcollection_item_handler, []}
             ,{"/blog/category/[...]"        , blog_category_handler, []}
             ,{"/blog/post/[...]"            , blog_post_handler, []}
+            ,{"/track/cover/[...]"          , track_cover_handler, []}
             ,{"/mbd/upload/[...]"           , mbd_upload_handler, []}
             ,{"/mbd/ms/upload/[...]"        , mbd_ms_upload_handler, []}
             ,{"/mbd/bg/upload/[...]"        , mbd_bg_upload_handler, []}
