@@ -24,7 +24,7 @@ class MkhLog:
     def __init__(self):
         self.mkhlogger = logging.getLogger('BrtdLogger')
         self.mkhlogger.setLevel(logging.DEBUG)
-        self.handler = logging.handlers.RotatingFileHandler('/var/log/ciwrkd.log', maxBytes=20000000, backupCount=50)
+        self.handler = logging.handlers.RotatingFileHandler('/var/log/ciwrkd_dancer.log', maxBytes=20000000, backupCount=50)
         self.mkhlogger.addHandler(self.handler)
 
     def logfmt(self, level, msg):
@@ -55,7 +55,7 @@ def program_terminate(signum, frame):
 
 def get_db():
     try:
-        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@34.198.91.198/edapi')
+        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@34.224.192.110/edapi')
         conn = engine.connect()
     except Exception as e:
         my_logger.error('cannot connect to DB %s' % e)
@@ -63,12 +63,12 @@ def get_db():
     return (engine, conn)
 
 def get_active_jobs():
-    cmdret = subprocess.getoutput("ps aux | grep tf_mbd_auto.py | grep -v grep | wc -l")
+    cmdret = subprocess.getoutput("ps aux | grep tf_mbd_auto_dancer.py | grep -v grep | wc -l")
     my_logger.info("Active jobs: '%s'" % cmdret)
     return int(cmdret)
 
-def do_job(db, img, job_id, size, pref_res):
-    cmd = "/home/ap/work/tf_mbd_auto.py '%s' %s %s %s " % (img, size, job_id, pref_res)
+def do_job(db, img, job_id, size):
+    cmd = "/home/ap/work/tf_mbd_auto_dancer.py %s %s %s " % (img.replace("&", "\&"), size, job_id)
     my_logger.info("do_job: %s" % cmd)
     os.system(cmd + " &")
     #cmdret = subprocess.getoutput(cmd)
@@ -80,15 +80,14 @@ def update_job(db, job_id, job_state):
 
 def get_jobs(db, maxr=1):
     my_logger.info("get %s new jobs" % maxr)
-    resp = db.engine.execute("select ic.id, ic.img, ic.isize, ifnull(u.pref_resolution, '0') from img_converter_queue ic left join user u on u.user_id = ic.uid "
-			     "where ic.status=0 order by ic.id asc limit %s" % maxr)
+    resp = db.engine.execute("select id, img, isize from img_converter_queue where status=0 order by id asc limit %s" % maxr)
     for row in resp:
         my_logger.info("processing img %s" % row[1])
         if row[2] == '2000' or row[2] == '780' or row[2] == 'mbdbg':
             img = '/opt/mybestday' + row[1]
         else: img = row[1]
         update_job(db, row[0], 1)
-        do_job(db, img, row[0], row[2], row[3])
+        do_job(db, img, row[0], row[2])
         #copy_resuls(row[1])
         #update_job(db, row[0], 2)
 

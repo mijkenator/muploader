@@ -251,18 +251,20 @@ def copy_original_tos3(img, oimg, tmp_dobject):
     fn, fext = os.path.splitext(os.path.basename(oimg))
     if os.path.isfile(tmp_dobject.name + '/p_i/' + fn + "_2000" + fext) == True:
         rfn = tmp_dobject.name + '/p_i/' + fn + "_2000" + fext
-        scpr = subprocess.getoutput("scp -i /root/edapi.pem '%s' root@34.198.91.198:\"'%s'\"" % (rfn, oimg))
+        scpr = subprocess.getoutput("scp -i /root/edapi.pem %s ubuntu@34.198.91.198:%s" % (rfn, oimg))
         print("replace orig: %s %s " % (oimg, scpr))
     elif os.path.isfile(tmp_dobject.name + '/p_i/' + fn + "_1500" + fext) == True:
         rfn = tmp_dobject.name + '/p_i/' + fn + "_1500" + fext
-        scpr = subprocess.getoutput("scp -i /root/edapi.pem '%s' root@34.198.91.198:\"'%s'\"" % (rfn, oimg))
+        scpr = subprocess.getoutput("scp -i /root/edapi.pem %s ubuntu@34.198.91.198:%s" % (rfn, oimg))
         print("replace orig: %s %s " % (oimg, scpr))
+    
+    
 
 if __name__ == "__main__":
     orig_img_name = sys.argv[1]
     (tmp_dobject, img_name) = copy_file_from_main(orig_img_name)
 
-
+    print("img_name: %s" % img_name)
     print(subprocess.getoutput("ls -la %s" % tmp_dobject.name))
 
     #exit(0)
@@ -311,5 +313,5 @@ if __name__ == "__main__":
     copy_results(tmp_dobject, orig_img_name)
     db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
     copy_original_tos3(img_name, orig_img_name, tmp_dobject)
-
+    print(subprocess.getoutput("ls -la %s/p_i" % tmp_dobject.name))
 

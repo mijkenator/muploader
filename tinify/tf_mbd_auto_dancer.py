@@ -8,8 +8,7 @@ import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey, DateTime, text
 from sqlalchemy.sql import select, and_
 from subprocess import call
-import subprocess, tempfile
-from shlex import quote
+import subprocess, tempfile, os.path
 
 def _get_if_exist(data, key):
     if key in data:
@@ -77,7 +76,7 @@ def extra_resizes_magick(origin_file):
     for width in [1500,1000,800,700,600,500,400,300,200]:
         opt_dst    = dst_path + file_name + "_" + str(width) + file_extension
         opt_dst_wp = dst_path + file_name + "_" + str(width) + '.webp'
-        print("(1)-> %s" % opt_dst)
+        print("-> %s" % opt_dst)
         im = Image.open(opt_origin)
         xsize, ysize = im.size
         if xsize < width:
@@ -89,7 +88,6 @@ def extra_resizes_magick(origin_file):
         
         geometr = "%sx%s" % (width, y)
         convert_cmd="convert '%s' -filter Triangle -define filter:support=2 -resize %s -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 75 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB '%s'" % (opt_origin, geometr, opt_dst)
-        print("Convert cmd: %s" % convert_cmd)
         cmdret = subprocess.getoutput(convert_cmd)
         print(cmdret)
 
@@ -110,7 +108,7 @@ def extra_resizes(origin_file):
     for width in [1500,1000,800,700,600,500,400,300,200]:
         opt_dst    = dst_path + file_name + "_" + str(width) + file_extension
         opt_dst_wp = dst_path + file_name + "_" + str(width) + '.webp'
-        print("(2)-> %s" % opt_dst)
+        print("-> %s" % opt_dst)
         im = Image.open(opt_origin)
         xsize, ysize = im.size
         if xsize < width:
@@ -130,7 +128,7 @@ def extra_resizes(origin_file):
             im.resize((width, y)).save(opt_dst, format='JPEG', quality=85, optimize=True)
             #im.resize((width, y)).save(opt_dst)
         ##webpcmd = "cwebp -q 90 %s -o %s" % (opt_origin, opt_dst_wp)
-        webpcmd = "cwebp -q 80 %s -o %s" % (opt_dst, opt_dst_wp)
+        webpcmd = "cwebp -q 80 '%s' -o '%s'" % (opt_dst, opt_dst_wp)
         subprocess.getoutput(webpcmd)
 
 
@@ -181,7 +179,7 @@ def do_job(origin_file, width):
 
 def get_db():
     try:
-        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@34.198.91.198/edapi')
+        engine = sqlalchemy.create_engine('mysql+pymysql://mijkweb:mijkweb@34.224.192.110/edapi')
         conn = engine.connect()
         metadata = MetaData(bind=engine)
     except:
@@ -229,9 +227,9 @@ def save_mbdms_upload(db, metadata, fname, jret, tcount, gpsi, ctimev):
 def copy_file_from_main(oimg):
     ret = tempfile.TemporaryDirectory(dir='/tmp')
     subprocess.getoutput("mkdir %s/p_i" % ret.name)
-    oimg1 = quote(oimg)
-    print("pre scpr: %s -> %s" % (oimg, oimg1))
-    scpr = subprocess.getoutput("scp -i /root/edapi.pem ubuntu@34.198.91.198:\"'%s'\" %s" % (oimg, ret.name))
+    cmd = "scp -i /root/edapi.pem 'ubuntu@34.224.192.110:%s' '%s'" % (oimg, ret.name)
+    print("copy cmd: %s" % cmd)
+    scpr = subprocess.getoutput(cmd)
     print("scpr ret: %s" % scpr)
     img = ret.name + "/" + os.path.basename(oimg)
     print(ret.name)
@@ -242,74 +240,52 @@ def copy_results(tmp_dobject, oimg):
     sdir = tmp_dobject.name + '/p_i/*'
     print("copy results: %s -> %s" % (sdir, ddir))
     #scpr = subprocess.getoutput("scp -i /root/edapi.pem %s ubuntu@34.198.91.198:%s" % (sdir, ddir))
-    scpr = subprocess.getoutput("rsync -azh %s -e \"ssh -i /root/edapi.pem\" ubuntu@34.198.91.198:%s" % (sdir, ddir))
-
-def copy_original_tos3(img, oimg, tmp_dobject):
-    uid = os.path.dirname(oimg).split('/')[-1]
-    print(subprocess.getoutput("aws s3 mb s3://photoalbm/users/%s" % uid))
-    print(subprocess.getoutput("aws s3 cp '%s' s3://photoalbm/users/%s/" % (img, uid)))
-    fn, fext = os.path.splitext(os.path.basename(oimg))
-    if os.path.isfile(tmp_dobject.name + '/p_i/' + fn + "_2000" + fext) == True:
-        rfn = tmp_dobject.name + '/p_i/' + fn + "_2000" + fext
-        scpr = subprocess.getoutput("scp -i /root/edapi.pem '%s' root@34.198.91.198:\"'%s'\"" % (rfn, oimg))
-        print("replace orig: %s %s " % (oimg, scpr))
-    elif os.path.isfile(tmp_dobject.name + '/p_i/' + fn + "_1500" + fext) == True:
-        rfn = tmp_dobject.name + '/p_i/' + fn + "_1500" + fext
-        scpr = subprocess.getoutput("scp -i /root/edapi.pem '%s' root@34.198.91.198:\"'%s'\"" % (rfn, oimg))
-        print("replace orig: %s %s " % (oimg, scpr))
+    scpr = subprocess.getoutput("rsync -azh %s -e \"ssh -i /root/edapi.pem\" ubuntu@34.224.192.110:%s" % (sdir, ddir))
 
 if __name__ == "__main__":
     orig_img_name = sys.argv[1]
+    job_id = sys.argv[3]
     (tmp_dobject, img_name) = copy_file_from_main(orig_img_name)
+    (engine, db, metadata) = get_db()
 
-
+    print("---> %s ---> %s" % (tmp_dobject, img_name))
     print(subprocess.getoutput("ls -la %s" % tmp_dobject.name))
+    if not os.path.exists(img_name):
+        print("file %s not exists, mark as 3 and exit" % img_name)
+        db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (3, job_id))
+        exit(0)
+
 
     #exit(0)
 
     sysargv2 = sys.argv[2]
     if sys.argv[2] == 'mbdbg': sysargv2 = '780'
     ret = do_job(img_name, int(sysargv2))
-    job_id   = sys.argv[3]
-    pref_res = sys.argv[4] 
     
     gpsi  = ret.pop('gps', "")
     ctime = ret.pop('ctime', "")
 
     jret = json.dumps(ret)
     print(jret)
-    (engine, db, metadata) = get_db()
     if sys.argv[2] == '780':
         tmpr = do_job(img_name, 2000)
         tmpr = do_job(img_name, 180)
-        save_picture_params(db, metadata,  orig_img_name, jret, 0, gpsi, ctime)
-        if(pref_res != '0'):
-            copy_results(tmp_dobject, orig_img_name)
-            db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
-            
+        #extra_resizes(img_name)
         extra_resizes_magick(img_name)
+        save_picture_params(db, metadata,  orig_img_name, jret, 0, gpsi, ctime)
     elif sys.argv[2] == '2000':
         tmpr = do_job(img_name, 780)
         tmpr = do_job(img_name, 180)
-        save_mbdms_upload(db, metadata, orig_img_name, jret, 0, gpsi, ctime)
-        if(pref_res != '0'):
-            copy_results(tmp_dobject, orig_img_name)
-            db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
-
+        #extra_resizes(img_name)
         extra_resizes_magick(img_name)
+        save_mbdms_upload(db, metadata, orig_img_name, jret, 0, gpsi, ctime)
     elif sys.argv[2] == 'mbdbg':
         tmpr = do_job(img_name, 2000)
         tmpr = do_job(img_name, 180)
-        if(pref_res != '0'):
-            copy_results(tmp_dobject, orig_img_name)
-            db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
-
         extra_resizes(img_name)
     else:
         print("unknown width, saving ignored")
 
     copy_results(tmp_dobject, orig_img_name)
     db.engine.execute("update img_converter_queue set status=%s  where id=%s" % (2, job_id))
-    copy_original_tos3(img_name, orig_img_name, tmp_dobject)
-
 
