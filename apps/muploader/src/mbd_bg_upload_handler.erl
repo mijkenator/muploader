@@ -45,6 +45,15 @@ save_upload(Params) ->
     AccountID = proplists:get_value(<<"mkh_account_id">>, Params, 0),  
     IsAdmin   = proplists:get_value(<<"mkh_account_isadmin">>, Params, 0),
     lager:debug("AID ~p, IsAdm ~p",[AccountID, IsAdmin]),
+
+    case proplists:get_value(<<"pref_resolution">>, Params, <<>>) of
+        <<>>    -> ok;
+        PrefRes -> 
+                lager:debug("BG_SPR :: ~p", [{AccountID, PrefRes}]),
+                PRRet = rpc:call('edapi@127.0.0.1', model_service_user, set_pref_resolution, [AccountID, PrefRes]),
+                lager:debug("BG_SPR ret :: ~p", [PRRet]),
+                ok
+    end,
     
     case {AccountID, IsAdmin} of
         {Aid, _} when is_integer(Aid), Aid>0 ->

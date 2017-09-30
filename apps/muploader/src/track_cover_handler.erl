@@ -44,8 +44,8 @@ handle(Req, State) ->
     {ok, Req4, State}.
 
 create_track(Params) ->
-    [Img, Title, Provider, Track] = [proplists:get_value(X, Params, <<>>) || X <- [
-        <<"mkh_image">>, <<"title">>, <<"provider">>, <<"track">>]],
+    [Img, Title, Provider, Track, Flag] = [proplists:get_value(X, Params, <<>>) || X <- [
+        <<"mkh_image">>, <<"title">>, <<"provider">>, <<"track">>, <<"flag">>]],
     FI = case Img of
 	    <<"/opt/mybestday", R/binary>> -> R
 	    ;_ -> Img
@@ -58,7 +58,7 @@ create_track(Params) ->
     case {AccountID, IsAdmin} of
         {_, 1} ->
             lager:debug("Admin CreateTrack:: ~p", [{FI, Title, Provider, Track}]),
-            CcR = rpc:call('edapi@127.0.0.1', model_service_user, crud_create_track, [FI, Title, Provider, Track, <<"user">>]),
+            CcR = rpc:call('edapi@127.0.0.1', model_service_user, crud_create_track, [FI, Title, Provider, Track, Flag]),
             lager:debug("Admin CreateTrack Ret: ~p", [CcR]);
         {Aid, _} when is_integer(Aid), Aid>0 ->
             lager:debug("User CreateTrack:: ~p", [{FI, Title, Provider, Track}]),
