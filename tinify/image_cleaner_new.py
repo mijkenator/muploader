@@ -24,27 +24,36 @@ def check_mbd_ms_uploads(conn):
         if os.path.splitext(fname)[1].lower() in ['svg','.svg']:
             continue
         if mbdms_count(connection, fname[14:]) == 0:
+            serch_pat = os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"
             print("%s is NOT present in DB! " % fname[14:])
-            #os.remove(fname)
+            os.remove(fname)
             #remove mods
-            for mf in glob.glob(os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"):
-                p = re.compile(re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
+            m_reg = re.escape(os.path.split(fname)[0])+"/p_i/"+re.escape(os.path.splitext(os.path.basename(fname))[0])+"_\d+"
+            p = re.compile(m_reg)
+            print("search regex: %s" % m_reg)
+            for mf in glob.glob(serch_pat):
                 if p.match(mf):
                     print("\tMods: %s" % mf)
-                    #os.remove(mf)
+                    os.remove(mf)
         else:
+            serch_pat = os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"
+            #print("%s is present in DB! (%s)" % (fname, serch_pat))
             print("%s is present in DB!" % fname)
             c = 0
-            for mf in glob.glob(os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"):
-                p = re.compile(re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
+            m_reg = re.escape(os.path.split(fname)[0])+"/p_i/"+re.escape(os.path.splitext(os.path.basename(fname))[0])+"_\d+"
+            p = re.compile(m_reg)
+            #print("search regex: %s" % m_reg)
+            for mf in glob.glob(serch_pat):
                 if p.match(mf):
-                    print("\tMods: %s" % mf)
+                    #print("\tMods: %s" % mf)
                     c += 1
             if c == 0:
                 #no optimized images, produce it
-                print("Making optimizing images")
+                print("Making optimizing images!!!!!")
                 if test_pipe(fname):
-                    call(["/home/ubuntu/work/tinify/tf_mbd.py", fname, '2000'])
+                    # insert job into queue
+                    made_img_conv_qr(fname[14:], '2000')
+                    #call(["/home/ubuntu/work/tinify/tf_mbd.py", fname, '2000'])
     return True
 
 def check_mbd_event_posts(conn):
@@ -59,26 +68,36 @@ def check_mbd_event_posts(conn):
             continue
         if mbdep_count(connection, fname[14:]) == 0:
             print("%s is NOT present in DB! " % fname)
-            #os.remove(fname)
+            os.remove(fname)
             #remove mods
-            for mf in glob.glob(os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"):
-                p = re.compile(re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
+            serch_pat = os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"
+            m_reg = re.escape(os.path.split(fname)[0])+"/p_i/"+re.escape(os.path.splitext(os.path.basename(fname))[0])+"_\d+"
+            p = re.compile(m_reg)
+            #for mf in glob.glob(os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"):
+            for mf in glob.glob(serch_pat):
+                #p = re.compile(re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
                 if p.match(mf):
-                    print("\tMods: %s" % mf)
-                    #os.remove(mf)
+                    pass
+                    #print("\tMods: %s" % mf)
+                    os.remove(mf)
         else:
             print("%s is present in DB!" % fname)
             c = 0
-            for mf in glob.glob(dir1+'p_i/'+os.path.splitext(fname)[0]+"_*"):
-                p = re.compile(".*/" + re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
+            #for mf in glob.glob(dir1+'p_i/'+os.path.splitext(fname)[0]+"_*"):
+            serch_pat = os.path.split(fname)[0]+"/p_i/"+os.path.splitext(os.path.basename(fname))[0]+ "_*"
+            m_reg = re.escape(os.path.split(fname)[0])+"/p_i/"+re.escape(os.path.splitext(os.path.basename(fname))[0])+"_\d+"
+            p = re.compile(m_reg)
+            for mf in glob.glob(serch_pat):
+                #p = re.compile(".*/" + re.escape(os.path.splitext(fname)[0])+"_\d+"+os.path.splitext(fname)[1])
                 if p.match(mf):
-                    print("\tMods: %s" % mf)
+                    #print("\tMods: %s" % mf)
                     c += 1
             if c == 0:
                 #no optimized images, produce it
                 print("Making optimizing images")
                 if test_pipe(fname):
-                    call(["/home/ubuntu/work/tinify/tf_mbd.py", fname, '780'])
+                    made_img_conv_qr(fname[14:], '780')
+                #    call(["/home/ubuntu/work/tinify/tf_mbd.py", fname, '780'])
     return True
 
 
@@ -111,6 +130,15 @@ def test_pipe(name):
     else:
         return False
 
+def made_img_conv_qr(name, isize):
+    try:
+        with connection.cursor() as cursor:
+           sql = "insert into img_converter_queue (img, status, isize) values (%s, 0, %s)"
+           cursor.execute(sql, (name, isize))
+           connection.commit()
+    except:
+        pass
+
 me = singleton.SingleInstance()
 
 connection = pymysql.connect(host='localhost',
@@ -120,7 +148,9 @@ connection = pymysql.connect(host='localhost',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
-check_mbd_ms_uploads(connection)
-#check_mbd_event_posts(connection)
+#check_mbd_ms_uploads(connection)
+check_mbd_event_posts(connection)
 	
 connection.close()
+
+print("DONE!")
