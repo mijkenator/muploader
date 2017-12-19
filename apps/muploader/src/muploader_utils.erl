@@ -8,6 +8,8 @@
     ,create_preview/2
     ,get_preview_options/0
     ,tinyfile/1
+    ,change_file_name/1
+    ,get_nfname/1
 ]).
 
 
@@ -50,6 +52,8 @@ tinyfile(<<"/opt/mwd_admin/images/", _/binary>> = FileName) when is_binary(FileN
     	lager:debug("MU TINY end ~p", [FileName])
     end,
     spawn(Fun);
+tinyfile(<<"/opt/mybestday/images/u/blog_cover", _/binary>> = FileName) when is_binary(FileName) -> ok;
+tinyfile(<<"/opt/mybestday/images/u/mbdblog_posts", _/binary>> = FileName) when is_binary(FileName) -> ok;
 tinyfile(_) -> ok.
 
 
@@ -73,6 +77,8 @@ get_tmp_dir(mbdbg,_)		             		    -> <<"/opt/mybestday/images/u/bg/">>;
 get_tmp_dir(mbdpost,_)		             		    -> <<"/opt/mybestday/images/u/posts/">>;
 
 get_tmp_dir(track,_)                                -> <<"/opt/mybestday/images/u/strack/">>;
+get_tmp_dir(blog_cover,_)                           -> <<"/opt/mybestday/images/u/blog_cover/">>;
+get_tmp_dir(mbdblog_post,_)                         -> <<"/opt/mybestday/images/u/mbdblog_posts/">>;
 
 
 get_tmp_dir(_,<<"collection[logo]">>)             -> <<"/opt/mwd_admin/images/collection_logos/">>;
@@ -119,3 +125,17 @@ create_preview(NameTo, NameFrom) ->
     lager:debug("Convert ret: ~p", [Ret]),
     true.
 
+-spec change_file_name(list()|binary()) -> binary().
+change_file_name(S) when is_list(S) -> change_file_name(list_to_binary(S));
+change_file_name(S) when is_binary(S), size(S) > 1, size(S) < 50 -> 
+    case re:run(S,"^[0-9A-Za-z-._]+$",[{capture,none}]) of
+        match -> S
+        ;_    -> get_nfname(filename:extension(S))
+    end;
+change_file_name(S) -> get_nfname(filename:extension(S)).
+
+-spec get_nfname(binary()) -> binary().
+get_nfname(Ext) ->
+    FN = list_to_binary(lists:foldl(fun(E,A)-> A++E end, "", [integer_to_list(X)||X<-tuple_to_list(erlang:now())])),
+    <<FN/binary, Ext/binary>>.
+    

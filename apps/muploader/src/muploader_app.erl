@@ -21,10 +21,12 @@ start(_StartType, _StartArgs) ->
             ,{"/blog/category/[...]"        , blog_category_handler, []}
             ,{"/blog/post/[...]"            , blog_post_handler, []}
             ,{"/track/cover/[...]"          , track_cover_handler, []}
+            ,{"/blog/cover/[...]"           , blog_cover_handler, []}
             ,{"/mbd/upload/[...]"           , mbd_upload_handler, []}
             ,{"/mbd/ms/upload/[...]"        , mbd_ms_upload_handler, []}
             ,{"/mbd/bg/upload/[...]"        , mbd_bg_upload_handler, []}
             ,{"/mbd/post/upload/[...]"      , mbd_post_upload_handler, []}
+            ,{"/mbdblog/post/[...]"         , mbdblog_handler, []}
             ,{"/mbd/mobile/upload/[...]"    , mbd_mobile_upload_handler, []}
             ,{"/user/img/[...]"             , user_handler, []}
             ,{"/[...]", cowboy_static, {dir, "../../priv_dir/html", [{mimetypes, cow_mimetypes, all}]}}

@@ -135,7 +135,8 @@ save_file(Req, FileName) ->
 
 -spec get_file_name(binary(), binary()) -> binary().
 get_file_name(UploadFileName0, InputName) ->
-    UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
+    %UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
+    UploadFileName = muploader_utils:change_file_name(UploadFileName0),
     lager:debug("GFN0: ~p ~p", [UploadFileName, InputName]),
     TempDirectory = muploader_utils:get_tmp_dir(track, InputName),
     lager:debug("GFN: ~p ~p", [InputName, TempDirectory]),

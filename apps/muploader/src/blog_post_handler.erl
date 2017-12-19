@@ -49,14 +49,16 @@ handle(Req, State) ->
     {ok, Req4, State}.
 
 create_blog_post(Params) ->
-    [Img, Logo, Title, Link, Author, Source, Published, Cid] = [proplists:get_value(X, Params, <<>>) || X <- [
+    [Img, Logo, Title, Link, Author, Source, Published, Cid, UserID, AlbomID] = [proplists:get_value(X, Params, <<>>) || X <- [
         <<"mkh_blog_post_image">>, <<"mkh_blog_post_logo">>, 
         <<"title">>,
         <<"link">>,
         <<"author">>,
         <<"source">>,
         <<"published">>,
-        <<"categoryid">>
+        <<"categoryid">>,
+        <<"userid">>,
+        <<"albomid">>
     ]],
     FI = case Img of
 	    <<"/opt/mwd_admin", R/binary>> -> R
@@ -74,10 +76,10 @@ create_blog_post(Params) ->
     case {AccountID, IsAdmin} of
         {_, 1} ->
             lager:debug("CreateBlogPost:: ~p", [{FI, Title}]),
-            CcR = rpc:call('edapi@127.0.0.1', model_blog, post_create, [FI, FL, Title, Link, Author, Source, Published, Cid]),
+            CcR = rpc:call('edapi@127.0.0.1', model_blog, post_create, [FI, FL, Title, Link, Author, Source, Published, Cid, UserID, AlbomID]),
             lager:debug("CreateBlogPost Ret: ~p", [CcR]);
         {Aid, _} when is_integer(Aid), Aid>0 ->
-            lager:debug("AID ~p, IsAdm ~p CID: ~p CREATE BLOG CATEGORY ACCESS DENIED",[AccountID, IsAdmin]);
+            lager:debug("AID ~p, IsAdm ~p CID: ~p 11111111CREATE POST ACCESS DENIED",[AccountID, IsAdmin]);
         _ -> ok
     end,
     ok.
@@ -156,7 +158,8 @@ save_file(Req, FileName) ->
 
 -spec get_file_name(binary(), binary()) -> binary().
 get_file_name(UploadFileName0, InputName) ->
-    UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
+    %UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
+    UploadFileName = muploader_utils:change_file_name(UploadFileName0),
     lager:debug("GFN0: ~p ~p", [UploadFileName, InputName]),
     TempDirectory = muploader_utils:get_tmp_dir(InputName),
     lager:debug("GFN: ~p ~p", [InputName, TempDirectory]),
