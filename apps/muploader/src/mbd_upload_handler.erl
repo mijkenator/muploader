@@ -72,8 +72,9 @@ multipart(Req, A) ->
                 {data, FieldName} ->
                     {ok, Body, Req3} = cowboy_req:part_body(Req2),
                     {Req3, [{FieldName, Body}]};
-                {file, FileInpName, Filename, _CType, _CTransferEncoding} ->
-		    lager:debug("mp BCH FNL: ~p ~p", [FileInpName, Filename]),
+                {file, FileInpName, Filename0, _CType, _CTransferEncoding} ->
+            Filename = muploader_utils:change_file_name(Filename0),
+		    lager:debug("mp BCH FNL ----> : ~p ~p ~p", [FileInpName, Filename, Filename0]),
 		    case FileInpName of
 			 FIN when FIN=:=<<"mbd_upload">>;FIN=:=<<"file">> ->
 			    SaveFileName1 = get_file_name(Filename, FileInpName),
@@ -105,8 +106,8 @@ save_file(Req, FileName) ->
 
 -spec get_file_name(binary(), binary()) -> binary().
 get_file_name(UploadFileName0, InputName) ->
-    %UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
-    UploadFileName = muploader_utils:change_file_name(UploadFileName0),
+    UploadFileName = re:replace(UploadFileName0, "\\s", "", [global, {return, binary}]),
+    %UploadFileName = muploader_utils:change_file_name(UploadFileName0),
     lager:debug("GFN0: ~p ~p", [UploadFileName, InputName]),
     TempDirectory = muploader_utils:get_tmp_dir(mbd, InputName),
     lager:debug("GFN: ~p ~p", [InputName, TempDirectory]),
